@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- ClickHub product; GAME:0; -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LyandClicker</title>
+</head>
+
+<body id='main'>
+
+    <h1>Добро пожаловать в Лянд Кликер!</h1>
+
+    <div>
+        <h2 id='score'>Кликай чтобы получить "лакикоины", и купить прокачку!</h2>
+
+        <button id="button" onclick="AddScore()">Нажми на меня!</button>
+        <br>
+        <p id="cloneCount">Пиздюков: 0, Силы: 1</p>
+    </div>
+    <br>
+
+    <div>
+        <h2>Прокачка:</h2>
+
+        <p id='strength'>Умножить силу! (10 ЛК):</p>
+        <button onclick="Multiply()">Улучшить</button>
+        <br><br>
+
+        <p id='clone'>Добавь пиздюка (50 ЛК):</p>
+        <button onclick="Clone()">Улучшить</button>
+    </div>
+    <br><br>
+
+    <div>
+        <h2>Безделушки:</h2>
+
+        <p>Сменить фон (1000 ЛК):</p><button onclick="ChangeBG()">Купить</button>
+        <br><br>
+        <p>Микроволновка (199999 ЛК):</p><button id="2" onclick="AddItem('2', 199999)">Купить</button>
+        <p>Снюс (70000 ЛК):</p><button id="3" onclick="AddItem('3', 70000)">Купить</button>
+        <p>Бесполезный трофей, НИЧЕГО НЕ ДАЁТ (1000000000 ЛК):</p><button id="4"
+            onclick="AddItem('4', 1000000000)">Купить</button>
+    </div>
+    <br><br>
+
+    <div>
+        <h2>Ачивки:</h2>
+        <p id="a1">Начать Игру (Собери 1 ЛК)</p>
+        <p id="a2">Сотка (Собери 100 ЛК)</p>
+        <p id="a3">Да (Собери 100000 ЛК)</p>
+        <p id="a4">Трофей ничего не даёт, зачем ты это сделал? (Собери 1000000000 ЛК)</p>
+        <p id="a5">Группа (Собери 10 пиздюков)</p>
+        <p id="a6">Банда (Собери 50 пиздюков)</p>
+        <p id="a7">Армия (Собери 100 пиздюков)</p>
+
+    </div>
+
+
+    <script>
+
+        const colors = [
+            "Crimson", "Chartreuse", "Cyan", "DarkOrange",
+            "DeepPink", "Gold", "SteelBlue", "SpringGreen"
+        ]
+
+        let score = 0;
+        let multiplier = 1
+
+        AddScore = () => {
+            score += multiplier;
+            update('score', score.toFixed());
+
+            currentColor = colors[random(0, colors.length)];
+            bgcolor('button', currentColor);
+            color('score', currentColor);
+
+            UpdateAchievements();
+        }
+
+
+        let multCost = 10;
+        Multiply = () => {
+            if (!(score.toFixed() >= multCost)) return;
+
+            score -= multCost;
+            multiplier *= 1.3;
+            multCost *= 1.5;
+
+            update('score', score.toFixed());
+            update('strength', `Умножить силу! (${multCost.toFixed()} ЛК)`);
+            update('cloneCount', `Пиздюков: ${cloneCount}, Силы: ${multiplier.toFixed(1)}`);
+
+        }
+
+        let cloneCost = 50;
+        let cloneCount = 0;
+        Clone = () => {
+            if (!(score.toFixed() >= cloneCost)) return;
+
+            score -= cloneCost;
+            cloneCost *= 1.3;
+            cloneCount++;
+
+            update('score', score.toFixed());
+            update('clone', `Добавь пиздюка (${cloneCost.toFixed()} ЛК)`);
+            update('cloneCount', `Пиздюков: ${cloneCount}, Силы: ${multiplier.toFixed(1)}`);
+
+            loop(() => {
+                score += 10;
+                update('score', score.toFixed());
+            }, 1000);
+
+            UpdateAchievements();
+        }
+
+        bgColors = ["rgb(16, 55, 55)", "rgb(55, 16, 55)", "rgb(55, 55, 16)", "rgb(16, 55, 16)", "rgb(16, 16, 55)", "rgb(55, 16, 16)",]
+        ChangeBG = () => {
+            if (!(score.toFixed() >= 1000)) return;
+
+            score -= 1000;
+            update('score', score.toFixed());
+
+            let newC = bgColors[random(0, bgColors.length - 1)]
+
+            while (element('main').style.background == newC) {
+                newC = bgColors[random(0, colors.length - 1)]
+            }
+
+            bgcolor('main', newC);
+
+        }
+
+        AddItem = (id, cost) => {
+            if (!(score.toFixed() >= cost) || content(id) == "Куплено!") return;
+
+            score -= cost;
+            update(id, "Куплено!");
+            bgcolor(id, "Lightgreen");
+
+            update('score', score.toFixed());
+
+            UpdateAchievements();
+        }
+
+
+        UpdateAchievements = () => {
+            if (score >= 1) color("a1", "LightGreen");
+            if (score >= 100) color("a2", "LightGreen");
+            if (score >= 100000) color("a3", "LightGreen");
+            if (score >= 1000000000) color("a4", "LightGreen");
+
+            if (cloneCount >= 10) color("a5", "LightGreen");
+            if (cloneCount >= 50) color("a6", "LightGreen");
+            if (cloneCount >= 100) color("a7", "LightGreen");
+        }
+
+
+    </script>
+
+
+    <script>
+        //Системные функции, НЕ ТРОГАТЬ!!!!!!
+
+        const element = (id) => {
+            return document.getElementById(id);
+        }
+
+        const random = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
+
+        const main = element('main');
+
+        const print = (text, type = 'p') => {
+            const newPart = document.createElement(type);
+            newPart.innerHTML = `${text}`;
+            main.appendChild(newPart);
+
+        }
+        const color = (id, color) => {
+            e = element(id);
+            e.style.color = color;
+        }
+        const bgcolor = (id, color) => {
+            e = element(id);
+            e.style.background = color;
+        }
+        const update = (id, text) => {
+            e = element(id);
+            e.innerHTML = `${text}`;
+        }
+        const content = (id) => {
+            e = element(id);
+            return e.innerHTML;
+        }
+
+        const loop = (func, time) => {
+            return setInterval(func, time);
+        }
+
+    </script>
+
+    <style>
+        body {
+            background-color: #373737;
+            font-family: Verdana, sans-serif;
+        }
+
+
+        button {
+            border-style: none;
+            border-radius: 7px;
+            font-size: medium;
+            padding: 12px;
+            font-family: Verdana, sans-serif;
+            background-color: rgb(255, 255, 255);
+        }
+
+        p,
+        h2,
+        h1 {
+            color: white;
+        }
+
+        #credit {
+            font-size: small;
+        }
+
+        textarea {
+            font-family: Verdana, sans-serif;
+            padding-top: 10px;
+            outline: none;
+            resize: vertical;
+            overflow: auto;
+            border-radius: 7px;
+        }
+
+        input {
+            font-family: Verdana, sans-serif;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            text-align: center;
+            border-style: none;
+            border-radius: 7px;
+        }
+    </style>
+</body>
+
+</html>
